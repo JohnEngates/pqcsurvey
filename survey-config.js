@@ -1,9 +1,75 @@
 /**
  * Quantum-Readiness Index (QRI) Survey Configuration
  * Contains all content for the QRI assessment tool
+ * 
+ * This file defines the data structure for the Quantum-Readiness Index survey, including:
+ * - Industry profiles with customized weights
+ * - 14 assessment factors with descriptions and rating guides
+ * - Actionable guidance for each factor
+ * - Score thresholds with corresponding guidance
+ * - General and vendor-specific recommendations
+ * 
+ * The data is exported as ES modules and consumed by survey.html
  */
 
+// Industry-specific weight profiles
+// Each profile contains a name, description, and optional custom weights for factors
+// Weights are mapped by factor ID (1-14) and determine the importance of each factor in scoring
+const industryProfiles = {
+  default: {
+    name: 'Default',
+    description: 'Standard weights applicable to most organizations'
+  },
+  financial: {
+    name: 'Financial Services',
+    description: 'Banks, insurance, investment firms with stringent compliance needs',
+    weights: {
+      1: 10, 2: 10, 3: 10, 4: 9, 5: 8, 6: 7, 7: 9, 
+      8: 8, 9: 8, 10: 5, 11: 7, 12: 4, 13: 5, 14: 5
+    }
+  },
+  healthcare: {
+    name: 'Healthcare',
+    description: 'Organizations with sensitive health data and long-term records',
+    weights: {
+      1: 9, 2: 8, 3: 9, 4: 9, 5: 7, 6: 8, 7: 8, 
+      8: 7, 9: 7, 10: 6, 11: 9, 12: 4, 13: 5, 14: 5
+    }
+  },
+  government: {
+    name: 'Government',
+    description: 'Public sector organizations with sovereignty concerns',
+    weights: {
+      1: 10, 2: 9, 3: 10, 4: 8, 5: 7, 6: 7, 7: 9, 
+      8: 7, 9: 9, 10: 6, 11: 8, 12: 4, 13: 5, 14: 6
+    }
+  },
+  technology: {
+    name: 'Technology',
+    description: 'Software, cloud, and technology companies',
+    weights: {
+      1: 9, 2: 8, 3: 10, 4: 8, 5: 10, 6: 7, 7: 9, 
+      8: 8, 9: 5, 10: 8, 11: 6, 12: 6, 13: 6, 14: 5
+    }
+  },
+  manufacturing: {
+    name: 'Manufacturing',
+    description: 'Supply chain and industrial organizations',
+    weights: {
+      1: 9, 2: 8, 3: 8, 4: 7, 5: 8, 6: 9, 7: 7, 
+      8: 9, 9: 6, 10: 7, 11: 5, 12: 5, 13: 6, 14: 6
+    }
+  }
+};
+
 // Survey factors with weights, descriptions, and detailed guidance
+// Each factor includes:
+// - id: unique identifier (1-14)
+// - w: default weight (1-10) showing factor importance
+// - label: short descriptive name
+// - desc: brief description
+// - guide: array of 5 descriptions for each maturity level (1-5)
+// - actionableGuidance: structured recommendations with what/why/how sections
 const factors = [
   { 
     id: 1, 
@@ -344,6 +410,10 @@ const factors = [
 ];
 
 // Score thresholds and detailed guidance
+// Defines score ranges for low/medium/high maturity with corresponding messages and recommendations
+// - low: 0-50% score range
+// - medium: 51-75% score range
+// - high: 76-100% score range
 const scoreThresholds = {
   low: {
     max: 50,
@@ -389,6 +459,8 @@ const scoreThresholds = {
 };
 
 // Vendor-agnostic recommendations for all organizations
+// Structured as categories with lists of recommended actions
+// Used when generating implementation guidance and timelines
 const generalRecommendations = [
   {
     category: 'Strategy & Planning',
@@ -423,6 +495,8 @@ const generalRecommendations = [
 ];
 
 // Cloudflare-specific recommendations
+// Contains vendor-specific guidance and implementation steps
+// Used in the results section to provide targeted product recommendations
 const cloudflareRecommendations = {
   infrastructure: {
     title: 'Accelerate PQC Adoption with Cloudflare',
@@ -447,4 +521,4 @@ const cloudflareRecommendations = {
   ]
 };
 
-export { factors, scoreThresholds, generalRecommendations, cloudflareRecommendations }; 
+export { factors, scoreThresholds, generalRecommendations, cloudflareRecommendations, industryProfiles }; 

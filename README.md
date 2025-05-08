@@ -2,14 +2,16 @@
 
 A web-based assessment tool to help organizations evaluate their readiness for post-quantum cryptography (PQC). The tool provides a comprehensive evaluation across 14 key factors spanning governance, technical, and operational dimensions.
 
+This interactive survey helps organizations benchmark their preparedness for the transition to quantum-safe cryptography, providing targeted recommendations and industry-specific insights.
+
 ## Features
 
-- Interactive assessment of 14 quantum-readiness factors
-- Weighted scoring system
-- Radar chart visualization
-- Detailed, actionable guidance for improvement
-- Factor-specific recommendations
-- Cloudflare-specific implementation guidance
+- Interactive assessment of 14 quantum-readiness factors covering governance, technical, and operational dimensions
+- Industry-specific weighted scoring system with customizable weights
+- Radar chart visualization for at-a-glance maturity assessment
+- Detailed, actionable guidance for improvement with short, medium, and long-term priorities
+- Factor-specific recommendations with what/why/how guidance
+- Cloudflare-specific implementation guidance for accelerated adoption
 
 ## Setup
 
@@ -31,19 +33,37 @@ http://localhost:8000/survey.html
 
 ## Usage
 
-1. Rate your organization's maturity level for each factor from 1 (non-existent/ad hoc) to 5 (best practice)
-2. Click "Calculate QRI" to view your results
-3. Review your:
-   - Overall QRI score
-   - Radar chart visualization
-   - Priority focus areas
-   - Factor-specific guidance
-   - Cloudflare implementation recommendations
+1. Select your industry profile to apply appropriate factor weightings (or customize weights manually)
+2. Rate your organization's maturity level for each factor from 1 (non-existent/ad hoc) to 5 (best practice)
+3. Click "Calculate QRI" to view your results
+4. Review your assessment:
+   - Overall QRI score and category breakdown
+   - Radar chart visualization of all 14 factors
+   - Priority focus areas with implementation timeline
+   - Factor-specific guidance and recommendations
+   - Cloudflare implementation recommendations for PQC adoption
+
+The tool automatically generates personalized guidance based on your lowest-scoring factors, providing targeted recommendations for immediate, medium-term, and long-term actions.
 
 ## License
 
 MIT License - feel free to use and modify as needed.
 
+## Project Structure
+
+- `survey-config.js` - Configuration file containing all survey data:
+  - Industry-specific weight profiles
+  - 14 assessment factors with detailed guidance
+  - Score thresholds and recommendations
+  - General and vendor-specific guidance
+
+- `survey.html` - Main application file with all UI and logic:
+  - Survey form with factor rating inputs
+  - Industry profile selector
+  - Scoring algorithm
+  - Results visualization
+  - Recommendation engine
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. 
+Contributions are welcome! Please feel free to submit a Pull Request to enhance the survey factors, improve the UI, or add new industry profiles. 
