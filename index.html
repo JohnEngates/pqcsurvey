@@ -2,23 +2,23 @@
 <html lang="en">
 <!--
   Quantum-Readiness Index (QRI) Scorecard
-  
+
   This tool helps organizations assess their readiness for post-quantum cryptography (PQC)
   by evaluating 14 key factors across governance, technical, and operational dimensions.
-  
+
   Features:
   - Interactive assessment of 14 quantum-readiness factors
   - Weighted scoring system with industry-specific profiles
   - Radar chart visualization
   - Contextual recommendations
   - Cloudflare-specific guidance for PQC implementation
-  
+
   Architecture:
   - Uses ES modules to import configuration data from survey-config.js
   - Pure JavaScript implementation with no build step required
   - Chart.js for radar chart visualization
   - TailwindCSS for styling (loaded via CDN)
-  
+
   Key Components:
   - Industry profile selector with custom weight adjustments
   - Factor rating system (1-5 scale)
@@ -29,9 +29,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cloudflare Quantum‑Readiness Index (QRI) Scorecard</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23f6821f' d='M428.3 307.1c-8.4-29.9-5.9-57.2 10.1-77.8 3.3-4.2 2.8-10.2-1.1-13.7-3.8-3.6-9.7-3.9-13.9-.4-7.2 6-13.6 13.5-18.9 22.1-5.4-32.8-29.3-58.9-61.2-63.9 22.4-14.2 10.8-49.9-16.5-49.9-22.6 0-37.9 26.7-27.1 47.2-65.4 1.1-131.4 52.3-161.8 128.5-43 .6-76.8 35.9-76.8 79 0 3.4.2 6.8.6 10.1-.4 0-.7-.2-1.1-.2-35.4 0-64.2 28.8-64.2 64.2s28.8 64.1 64.2 64.1h331c50.7 0 91.9-41.2 91.9-91.9 0-49.6-39.4-90.2-88.9-91.7zM86.5 479.8c-39.2 0-70.9-31.9-70.9-70.9 0-33.8 23.7-62.1 55.1-69.2-4.3 11.8-6.6 24.5-6.6 37.6 0 57.2 41.1 104.9 95.3 115.4-22.5-3.4-45.6-6.8-72.5-12.8l-.4-.1zM144 406.7c-1.5-16.6-3.8-40.7 9.8-63.6 15.9-26.6 39.1-35.7 68.9-26.9 31.2 9.2 72.2-4.1 92.5-29.8 19.7-25.1 26.1-27.8 53.4-25 30.4 3.1 44.9 27.8 34 54.2-19 46.2-71.7 87.7-126.3 91.9C243.8 411.4 186.8 409.5 144 406.7z'/%3E%3C/svg%3E" type="image/svg+xml" />
   <!-- External Dependencies -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <!-- Main application code -->
   <script type="module">
     // Import configuration from survey-config.js
@@ -41,9 +43,13 @@
     // - generalRecommendations: Generic guidance for all organizations
     // - cloudflareRecommendations: Vendor-specific implementation steps
     // - industryProfiles: Industry-specific weight profiles
-    console.log('Starting script execution...');
-    import { factors, scoreThresholds, generalRecommendations, cloudflareRecommendations, industryProfiles } from './survey-config.js';
-    console.log('Imports successful:', { factors, scoreThresholds, industryProfiles });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('Starting script execution...');
+      try {
+        const { factors, scoreThresholds, generalRecommendations, cloudflareRecommendations, industryProfiles }
+          = await import('./survey-config.js');
+        console.log('Imports successful:', { factors, scoreThresholds, industryProfiles });
     
     // Initialize industry profiles selector 
     // Populates the industry dropdown with options from industryProfiles
@@ -205,8 +211,8 @@
       });
     }
 
-    // Call initialization function when DOM is ready
-    document.addEventListener('DOMContentLoaded', initializeSurvey);
+    // Initialize the survey right away, since we're already in DOMContentLoaded
+    initializeSurvey();
 
     // Handle form submission
     const form = document.getElementById('qriForm');
@@ -264,24 +270,28 @@
       const breakdownHtml = categories.map(category => {
         const categoryFactors = scores.filter(f => category.factors.includes(f.id));
         const categoryScore = Math.round(
-          (categoryFactors.reduce((sum, f) => sum + (f.score * f.weight), 0) / 
+          (categoryFactors.reduce((sum, f) => sum + (f.score * f.weight), 0) /
            categoryFactors.reduce((sum, f) => sum + (5 * f.weight), 0)) * 100
         );
-        
+
         // Create color class based on score
-        const colorClass = categoryScore < 50 ? 'bg-red-500' : 
-                          categoryScore < 75 ? 'bg-yellow-500' : 
-                          'bg-green-500';
-        
+        const colorClass = categoryScore < 50 ? 'bg-red-500' :
+                          categoryScore < 75 ? 'bg-yellow-500' :
+                          'bg-[#f6821f]';
+
+        // Get the factors included in this category for the tooltip
+        const factorsList = categoryFactors.map(f => `${f.id}. ${f.label}`).join(', ');
+
         return `
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <span class="font-medium">${category.name}</span>
-              <span>${categoryScore}%</span>
+          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-[#f6821f] transition-colors">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-bold text-lg">${category.name}</span>
+              <span class="font-bold text-lg ${categoryScore < 50 ? 'text-red-500' : categoryScore < 75 ? 'text-yellow-600' : 'text-[#f6821f]'}">${categoryScore}%</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div class="${colorClass} h-2.5 rounded-full" style="width: ${categoryScore}%"></div>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-3">
+              <div class="${colorClass} h-4 rounded-full transition-all duration-1000" style="width: ${categoryScore}%"></div>
             </div>
+            <div class="text-xs text-gray-500 mt-1">Includes: ${factorsList}</div>
           </div>
         `;
       }).join('');
@@ -436,7 +446,7 @@
       window.radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-          labels: scores.map(f => `${f.id}. ${f.label}`),
+          labels: scores.map(f => `${f.id}. ${f.label.split(' ').slice(0, 2).join(' ')}...`),
           datasets: [{
             label: 'Your Scores',
             data: scores.map(f => f.score),
@@ -451,14 +461,6 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: {
-            padding: {
-              top: 30,
-              right: 50,
-              bottom: 30,
-              left: 50
-            }
-          },
           scales: {
             r: {
               beginAtZero: true,
@@ -466,14 +468,22 @@
               min: 0,
               ticks: {
                 stepSize: 1,
-                backdropPadding: 10
+                backdropColor: 'transparent'
+              },
+              angleLines: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
               },
               pointLabels: {
                 font: {
-                  size: 10 /* Reduced from 11 to 10 for better fit */
+                  size: 11,
+                  weight: 'medium'
                 },
-                padding: 60, /* Reduced from 150 to 60 to bring labels closer to chart */
-                centerPointLabels: true
+                padding: 70,
+                centerPointLabels: true,
+                color: '#555'
               }
             }
           },
@@ -481,11 +491,37 @@
             legend: {
               position: 'top',
               labels: {
-                padding: 20,
+                padding: 25,
                 font: {
-                  size: 12
-                }
+                  size: 14,
+                  weight: 'bold'
+                },
+                color: '#333',
+                boxWidth: 30,
+                boxHeight: 3
+              },
+              title: {
+                display: true,
+                text: 'Quantum Readiness Factor Scores',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                },
+                color: '#f6821f',
+                padding: 10
               }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(246, 130, 31, 0.8)',
+              titleFont: {
+                size: 14
+              },
+              bodyFont: {
+                size: 13
+              },
+              padding: 15,
+              cornerRadius: 6,
+              displayColors: false
             }
           }
         }
@@ -505,56 +541,132 @@
       
       // Setup toggle for all factors view only (removed export/share functionality)
     });
+      } catch (error) {
+        console.error('Error loading survey configuration:', error);
+        alert('There was an error loading the survey configuration. Please check the console for details.');
+      }
+    });
   </script>
   
   <!-- Styles -->
   <style>
-    /* Custom Cloudflare theme and component styles */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    /* Updated Cloudflare theme based on cloudflare.com/pqc/ */
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Open Sans', sans-serif;
+      color: #222;
+      background-color: #f7f7f8;
     }
     .cloudflare-gradient {
-      background: linear-gradient(135deg, #2C2E33 0%, #1A1B1E 100%);
+      background-color: #f6821f; /* Cloudflare orange */
+      background: linear-gradient(90deg, #f6821f 0%, #fbad41 100%);
     }
     .cloudflare-orange {
-      background-color: #F6821F;
+      background-color: #f6821f; /* Cloudflare orange */
+      border: none;
+      transition: opacity 0.2s ease;
     }
     .cloudflare-orange:hover {
-      background-color: #E5731C;
+      opacity: 0.9;
+      background-color: #fbad41;
     }
     .cloudflare-dark {
-      background-color: #2C2E33;
+      background-color: #f6821f; /* Cloudflare orange */
     }
     .cloudflare-text {
-      color: #2C2E33;
+      color: #222;
+    }
+    .cloudflare-blue {
+      color: #f6821f; /* Changed to Cloudflare orange */
     }
     .cloudflare-border {
-      border-color: #E5E7EB;
+      border-color: #eaeaea;
     }
     .chart-container {
       position: relative;
-      height: 700px; /* Further increased height for better display */
+      height: 600px;
       width: 100%;
-      max-width: 1100px; /* Further increased max-width for more horizontal space */
+      max-width: 800px;
       margin: 0 auto;
-      padding: 20px; /* Further reduced padding to give more space to the chart */
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .chart-container:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      border-color: #f6821f;
+    }
+    .btn-cloudflare {
+      background-color: #f6821f;
+      color: white;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+    .btn-cloudflare:hover {
+      opacity: 0.9;
+      background-color: #fbad41;
+    }
+    .btn-cloudflare-orange {
+      background-color: #f6821f;
+      color: white;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+    .btn-cloudflare-orange:hover {
+      opacity: 0.9;
+      background-color: #fbad41;
+    }
+    /* Card styling */
+    .cf-card {
+      border-radius: 8px;
+      border: 1px solid #eaeaea;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body class="bg-white text-cloudflare-text min-h-screen flex flex-col">
   <!-- Header Section -->
-  <header class="cloudflare-gradient text-white py-8 shadow-lg">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="flex items-center justify-center gap-4 mb-2">
-        <!-- Cloudflare Logo -->
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 0C7.163 0 0 7.163 0 16C0 24.837 7.163 32 16 32C24.837 32 32 24.837 32 16C32 7.163 24.837 0 16 0ZM16 4.8C22.627 4.8 27.2 9.373 27.2 16C27.2 22.627 22.627 27.2 16 27.2C9.373 27.2 4.8 22.627 4.8 16C4.8 9.373 9.373 4.8 16 4.8Z" fill="#F6821F"/>
-          <path d="M16 8C11.582 8 8 11.582 8 16C8 20.418 11.582 24 16 24C20.418 24 24 20.418 24 16C24 11.582 20.418 8 16 8Z" fill="#F6821F"/>
-        </svg>
-        <h1 class="text-3xl font-bold">Quantum‑Readiness Index (QRI)</h1>
+  <header class="cloudflare-gradient text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6">
+      <!-- Navigation bar -->
+      <div class="py-4 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <!-- Cloudflare Logo -->
+          <a href="#" class="flex items-center">
+            <svg xmlns='http://www.w3.org/2000/svg' width="140" height="30" fill='none' viewBox='0 0 204 30' class="mt-1">
+              <g clip-path='url(#a)'>
+                <path fill='#FBAD41' d='M52.688 13.028c-.22 0-.437.008-.654.015a.297.297 0 0 0-.102.024.365.365 0 0 0-.236.255l-.93 3.249c-.401 1.397-.252 2.687.422 3.634.618.876 1.646 1.39 2.894 1.45l5.045.306c.15.008.28.08.359.199a.492.492 0 0 1 .051.434.64.64 0 0 1-.547.426l-5.242.306c-2.848.132-5.912 2.456-6.987 5.29l-.378 1a.28.28 0 0 0 .248.382h18.054a.48.48 0 0 0 .464-.35 13.12 13.12 0 0 0 .48-3.54c0-7.22-5.789-13.072-12.933-13.072'></path>
+                <path fill='#FFF' d='M85.519 18.886h2.99v8.249h5.218v2.647h-8.208V18.886ZM96.819 24.365v-.032c0-3.13 2.493-5.665 5.821-5.665 3.327 0 5.789 2.508 5.789 5.633v.032c0 3.129-2.493 5.665-5.821 5.665s-5.79-2.505-5.79-5.633Zm8.562 0v-.032c0-1.573-1.123-2.942-2.773-2.942-1.65 0-2.725 1.337-2.725 2.91v.032c0 1.572 1.122 2.942 2.757 2.942 1.634 0 2.741-1.338 2.741-2.91ZM112.086 25.003V18.89h3.033v6.055c0 1.572.783 2.317 1.985 2.317 1.201 0 1.985-.717 1.985-2.242v-6.134h3.032v6.039c0 3.519-1.985 5.056-5.049 5.056s-4.99-1.573-4.99-4.98M126.694 18.889h4.159c3.848 0 6.081 2.241 6.081 5.382v.032c0 3.14-2.265 5.477-6.144 5.477h-4.096V18.886v.004Zm4.202 8.216c1.788 0 2.97-.995 2.97-2.754v-.032c0-1.744-1.185-2.755-2.97-2.755h-1.217v5.541h1.217ZM141.277 18.886h8.621v2.648h-5.636v1.85h5.096v2.505h-5.096v3.893h-2.985V18.886ZM154.054 18.886h2.989v8.249h5.219v2.647h-8.208V18.886ZM170.067 18.809h2.878l4.589 10.971h-3.202l-.788-1.946h-4.159l-.768 1.946h-3.143l4.589-10.971h.004Zm2.619 6.676-1.202-3.097-1.217 3.097h2.419ZM181.383 18.889h5.096c1.647 0 2.789.438 3.509 1.182.635.621.954 1.465.954 2.536v.032c0 1.664-.879 2.77-2.218 3.344l2.572 3.797h-3.45l-2.17-3.3h-1.308v3.3h-2.989V18.886l.004.004Zm4.959 5.23c1.016 0 1.602-.497 1.602-1.29v-.031c0-.856-.614-1.29-1.618-1.29h-1.954v2.616h1.973l-.003-.004ZM195.253 18.886h8.669v2.568h-5.711v1.648h5.175v2.384h-5.175v1.728h5.79v2.568h-8.748V18.886ZM78.976 25.642c-.418.956-1.3 1.633-2.47 1.633-1.63 0-2.756-1.37-2.756-2.942V24.3c0-1.573 1.094-2.91 2.725-2.91 1.229 0 2.166.764 2.564 1.807h3.147c-.505-2.591-2.757-4.53-5.683-4.53-3.324 0-5.821 2.536-5.821 5.665v.032c0 3.129 2.461 5.633 5.79 5.633 2.843 0 5.068-1.864 5.655-4.36h-3.155l.004.004Z'></path>
+                <path fill='#F6821F' d='m44.808 29.578.334-1.175c.402-1.397.253-2.687-.42-3.634-.62-.876-1.647-1.39-2.896-1.45l-23.665-.306a.467.467 0 0 1-.374-.199.492.492 0 0 1-.052-.434.64.64 0 0 1 .552-.426l23.886-.306c2.836-.131 5.9-2.456 6.975-5.29l1.362-3.6a.914.914 0 0 0 .04-.477C48.998 5.259 42.79 0 35.368 0c-6.842 0-12.647 4.462-14.73 10.665a6.92 6.92 0 0 0-4.911-1.374c-3.28.33-5.92 3.002-6.246 6.318a7.148 7.148 0 0 0 .18 2.472c-5.36.16-9.66 4.598-9.66 10.052 0 .493.035.979.106 1.453a.46.46 0 0 0 .457.402h43.704a.57.57 0 0 0 .54-.418'></path>
+              </g>
+              <defs>
+                <clipPath id='a'>
+                  <path fill='#FFF' d='M0 0h204v30H0z'></path>
+                </clipPath>
+              </defs>
+            </svg>
+          </a>
+          <nav class="hidden md:flex space-x-8">
+            <a href="#" class="text-white text-sm font-medium hover:text-gray-200">Products</a>
+            <a href="#" class="text-white text-sm font-medium hover:text-gray-200">Solutions</a>
+            <a href="#" class="text-white text-sm font-medium hover:text-gray-200">Developers</a>
+            <a href="#" class="text-white text-sm font-medium hover:text-gray-200">Resources</a>
+            <a href="#" class="text-white text-sm font-medium hover:text-gray-200">Pricing</a>
+          </nav>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="#" class="hidden md:block text-white text-sm font-medium hover:text-gray-200">Sign in</a>
+          <a href="#" class="hidden md:block text-white text-sm font-medium bg-white/10 px-4 py-2 rounded-md hover:bg-white/20">Contact sales</a>
+        </div>
       </div>
-      <p class="text-center text-gray-300 mt-2">Benchmark your organization's ability to adopt post‑quantum cryptography</p>
+
+      <!-- Hero Section -->
+      <div class="py-12 text-center">
+        <h1 class="text-4xl font-bold mb-4">Quantum‑Readiness Index (QRI)</h1>
+        <p class="text-xl text-gray-200 max-w-3xl mx-auto">Benchmark your organization's ability to adopt post‑quantum cryptography</p>
+      </div>
     </div>
   </header>
 
@@ -563,26 +675,26 @@
     <p class="mb-6 text-gray-700">For each factor, choose a maturity level from <strong>1 (non‑existent / ad hoc)</strong> to <strong>5 (best practice)</strong>. Click <em>Calculate QRI</em> for your score, radar chart, and next‑step guidance.</p>
 
     <!-- Industry Profile Selector -->
-    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
-      <h2 class="text-lg font-semibold mb-4">Customize for Your Industry</h2>
+    <div class="cf-card bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
+      <h2 class="text-xl font-semibold mb-4 cloudflare-blue">Customize for Your Industry</h2>
       <div class="mb-4">
         <label for="industrySelector" class="block text-sm font-medium text-gray-700">Select your industry:</label>
-        <select id="industrySelector" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md">
+        <select id="industrySelector" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-200 focus:outline-none focus:ring-[#f6821f] focus:border-[#f6821f] sm:text-sm rounded-md">
           <option value="default">Default (Standard Weights)</option>
           <!-- Industry options will be added dynamically -->
         </select>
         <p id="industryDescription" class="mt-2 text-sm text-gray-500">Standard weights applicable to most organizations</p>
       </div>
-      
+
       <!-- Custom Weight Adjustment Panel -->
       <div id="customWeights" class="mt-6 hidden">
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-md font-medium">Adjust Factor Weights</h3>
-          <button type="button" id="toggleWeights" class="text-sm text-orange-600 hover:text-orange-800">
+          <button type="button" id="toggleWeights" class="text-sm text-[#f6821f] hover:text-[#fbad41] transition-colors">
             Show Weight Controls
           </button>
         </div>
-        <div id="weightControls" class="bg-gray-50 rounded-md p-2 hidden">
+        <div id="weightControls" class="bg-gray-50 rounded-md p-4 hidden border border-gray-200">
           <p class="text-xs text-gray-500 mb-2">Drag sliders to customize factor weights (1-10) for your organization's priorities</p>
           <div id="weightSliders" class="max-h-60 overflow-y-auto"></div>
         </div>
@@ -606,116 +718,123 @@
     <!-- Survey Form -->
     <form id="qriForm" class="space-y-10">
       <div id="factorBlocks" class="space-y-10"></div>
-      <button type="submit" class="cloudflare-orange hover:cloudflare-orange text-white px-8 py-3 rounded-lg shadow-md font-medium transition-colors duration-200">Calculate QRI</button>
+      <button type="submit" class="btn-cloudflare-orange text-white px-8 py-3 rounded-md shadow-md font-medium transition-opacity duration-200 hover:opacity-90">Calculate QRI</button>
     </form>
 
     <!-- Results Section -->
     <section id="results" class="mt-12 hidden space-y-8">
-      <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+      <div class="cf-card bg-white p-8 rounded-lg shadow-md border border-gray-200">
         <!-- Results Header -->
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-semibold">Your QRI Assessment Results</h2>
+          <h2 class="text-3xl font-semibold cloudflare-blue">Your QRI Assessment Results</h2>
         </div>
-        
+
         <!-- Executive Summary -->
-        <div class="mb-8 border-b pb-6">
-          <div class="flex justify-between items-center">
-            <p id="scoreDisplay" class="text-2xl font-bold"></p>
-            <p id="assessmentDate" class="text-sm text-gray-500"></p>
-          </div>
-          <div id="scoreMessage" class="text-lg mt-4 mb-4"></div>
+        <div class="mb-10 border-b border-gray-100 pb-10">
+          <!-- Date shown as subtle text above the score -->
+          <p id="assessmentDate" class="text-sm text-gray-500 mb-3"></p>
+
+          <!-- Score displayed prominently -->
+          <p id="scoreDisplay" class="text-3xl font-bold text-[#f6821f] mb-5"></p>
+
+          <!-- Message with more space -->
+          <div id="scoreMessage" class="text-lg mb-4 max-w-3xl"></div>
         </div>
         
         <!-- Visualization Section -->
-        <div class="mb-8 border-b pb-6">
-          <h3 class="text-xl font-semibold mb-4">Score Visualization</h3>
-          <div class="grid gap-8">
-            <!-- Score Breakdown -->
-            <div>
-              <h4 class="font-medium mb-3">Score Breakdown by Category</h4>
-              <div id="scoreBreakdown" class="space-y-4">
-                <!-- Categories will be populated dynamically -->
+        <div class="mb-12 border-b border-gray-100 pb-12">
+          <h3 class="text-xl font-semibold mb-6 cloudflare-blue">Score Visualization</h3>
+
+          <!-- Restructuring to stack elements vertically for more space -->
+          <div class="flex flex-col space-y-12">
+            <!-- Radar Chart - Full width with increased height -->
+            <div class="w-full">
+              <div class="chart-container bg-white rounded-lg shadow-sm border border-gray-100 h-[650px] mx-auto">
+                <canvas id="radarChart"></canvas>
               </div>
             </div>
-            
-            <!-- Radar Chart -->
-            <div class="chart-container bg-white rounded-lg shadow-sm mx-auto">
-              <canvas id="radarChart"></canvas>
+
+            <!-- Score Breakdown - Full width with more padding -->
+            <div class="w-full py-4">
+              <h4 class="font-medium mb-6 text-[#f6821f] text-xl">Score Breakdown by Category</h4>
+              <div id="scoreBreakdown" class="space-y-8 max-w-3xl mx-auto">
+                <!-- Categories will be populated dynamically -->
+              </div>
             </div>
           </div>
         </div>
         
         <!-- Strategic Roadmap -->
-        <div class="mb-8 border-b pb-6">
-          <h3 class="text-xl font-semibold mb-4">Strategic Roadmap</h3>
-          <div class="bg-orange-50 p-4 rounded-lg mb-6">
-            <h4 class="font-medium text-orange-800 mb-2" id="priorityFocus"></h4>
-            <ul class="list-disc ml-5 space-y-2 text-orange-900" id="priorityActions"></ul>
+        <div class="mb-8 border-b border-gray-100 pb-8">
+          <h3 class="text-xl font-semibold mb-4 cloudflare-blue">Strategic Roadmap</h3>
+          <div class="bg-orange-50 p-6 rounded-lg mb-6 border border-orange-100">
+            <h4 class="font-medium text-[#f6821f] mb-3" id="priorityFocus"></h4>
+            <ul class="list-disc ml-5 space-y-2 text-gray-700" id="priorityActions"></ul>
           </div>
-          
+
           <!-- Implementation Timeline -->
           <div>
-            <h4 class="font-medium mb-3">Suggested Implementation Timeline</h4>
-            <div class="space-y-4">
-              <div class="border border-gray-200 rounded-lg p-4">
-                <h5 class="font-medium text-gray-700">Immediate (0-3 months)</h5>
-                <ul class="list-disc ml-5 mt-2 space-y-1 text-gray-700" id="immediatePriorities"></ul>
+            <h4 class="font-medium mb-4 text-[#f6821f]">Suggested Implementation Timeline</h4>
+            <div class="space-y-6">
+              <div class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] transition-colors duration-300">
+                <h5 class="font-medium text-[#f6821f] mb-2">Immediate (0-3 months)</h5>
+                <ul class="list-disc ml-5 mt-2 space-y-2 text-gray-700" id="immediatePriorities"></ul>
               </div>
-              <div class="border border-gray-200 rounded-lg p-4">
-                <h5 class="font-medium text-gray-700">Medium-term (3-12 months)</h5>
-                <ul class="list-disc ml-5 mt-2 space-y-1 text-gray-700" id="mediumPriorities"></ul>
+              <div class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] transition-colors duration-300">
+                <h5 class="font-medium text-[#f6821f] mb-2">Medium-term (3-12 months)</h5>
+                <ul class="list-disc ml-5 mt-2 space-y-2 text-gray-700" id="mediumPriorities"></ul>
               </div>
-              <div class="border border-gray-200 rounded-lg p-4">
-                <h5 class="font-medium text-gray-700">Long-term (12+ months)</h5>
-                <ul class="list-disc ml-5 mt-2 space-y-1 text-gray-700" id="longPriorities"></ul>
+              <div class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] transition-colors duration-300">
+                <h5 class="font-medium text-[#f6821f] mb-2">Long-term (12+ months)</h5>
+                <ul class="list-disc ml-5 mt-2 space-y-2 text-gray-700" id="longPriorities"></ul>
               </div>
             </div>
           </div>
         </div>
         
         <!-- Detailed Factor Analysis -->
-        <div id="factorGuidance" class="mb-8 border-b pb-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold">Priority Improvement Areas</h3>
-            <button id="toggleAllFactors" class="text-sm text-orange-600 hover:text-orange-800">Show All Factors</button>
+        <div id="factorGuidance" class="mb-8 border-b border-gray-100 pb-8">
+          <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-semibold cloudflare-blue">Priority Improvement Areas</h3>
+            <button id="toggleAllFactors" class="text-sm text-[#f6821f] hover:text-[#fbad41] transition-colors px-4 py-2 border border-[#f6821f] rounded-md hover:bg-orange-50">Show All Factors</button>
           </div>
           <div class="space-y-6" id="lowScoreGuidance"></div>
           <div class="space-y-6 hidden" id="allFactorsGuidance"></div>
         </div>
 
         <!-- Cloudflare Solutions -->
-        <div id="cloudflareGuidance" class="bg-blue-50 p-6 rounded-lg mb-6">
-          <h3 class="text-xl font-semibold mb-4 text-blue-900">Accelerate Your Journey with Cloudflare</h3>
-          <div class="grid md:grid-cols-2 gap-6">
+        <div id="cloudflareGuidance" class="bg-orange-50 p-8 rounded-lg mb-8 border border-orange-100">
+          <h3 class="text-2xl font-semibold mb-6 text-[#f6821f]">Accelerate Your Journey with Cloudflare</h3>
+          <div class="grid md:grid-cols-2 gap-8">
             <div>
-              <h4 class="font-medium text-blue-800 mb-2">Key Benefits</h4>
-              <ul class="list-disc ml-5 space-y-2 text-blue-900" id="cloudflareBenefits"></ul>
+              <h4 class="font-medium text-[#f6821f] mb-3">Key Benefits</h4>
+              <ul class="list-disc ml-5 space-y-3 text-gray-700" id="cloudflareBenefits"></ul>
             </div>
             <div>
-              <h4 class="font-medium text-blue-800 mb-2">Features</h4>
-              <ul class="list-disc ml-5 space-y-2 text-blue-900" id="cloudflareFeatures"></ul>
+              <h4 class="font-medium text-[#f6821f] mb-3">Features</h4>
+              <ul class="list-disc ml-5 space-y-3 text-gray-700" id="cloudflareFeatures"></ul>
             </div>
           </div>
-          <div class="mt-4">
-            <h4 class="font-medium text-blue-800 mb-2">Implementation Steps</h4>
-            <ul class="list-disc ml-5 space-y-2 text-blue-900" id="cloudflareSteps"></ul>
+          <div class="mt-6">
+            <h4 class="font-medium text-[#f6821f] mb-3">Implementation Steps</h4>
+            <ul class="list-disc ml-5 space-y-3 text-gray-700" id="cloudflareSteps"></ul>
           </div>
         </div>
         
         <!-- Additional Resources -->
         <div>
-          <h3 class="text-xl font-semibold mb-4">Additional Resources</h3>
-          <div class="grid md:grid-cols-3 gap-4">
-            <a href="#" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <h4 class="font-medium mb-1">NIST PQC Standards</h4>
+          <h3 class="text-xl font-semibold mb-5 cloudflare-blue">Additional Resources</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            <a href="#" class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] hover:shadow-md transition-all group">
+              <h4 class="font-medium mb-2 group-hover:text-[#f6821f] transition-colors">NIST PQC Standards</h4>
               <p class="text-sm text-gray-600">Official post-quantum cryptography standards and guidance</p>
             </a>
-            <a href="#" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <h4 class="font-medium mb-1">PQC Implementation Guide</h4>
+            <a href="#" class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] hover:shadow-md transition-all group">
+              <h4 class="font-medium mb-2 group-hover:text-[#f6821f] transition-colors">PQC Implementation Guide</h4>
               <p class="text-sm text-gray-600">Technical guidance for implementing quantum-safe algorithms</p>
             </a>
-            <a href="#" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <h4 class="font-medium mb-1">Quantum Computing Timeline</h4>
+            <a href="#" class="border border-gray-200 rounded-lg p-5 hover:border-[#f6821f] hover:shadow-md transition-all group">
+              <h4 class="font-medium mb-2 group-hover:text-[#f6821f] transition-colors">Quantum Computing Timeline</h4>
               <p class="text-sm text-gray-600">Projected timeline for quantum computing development</p>
             </a>
           </div>
@@ -724,9 +843,78 @@
     </section>
   </main>
 
-  <footer class="text-center text-gray-500 text-sm py-6 cloudflare-dark text-gray-300">
-    <div class="max-w-4xl mx-auto px-6">
-      <p>© 2025 Cloudflare Quantum‑Readiness Scorecard</p>
+  <footer class="cloudflare-dark text-white py-12">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-5 gap-8 mb-8">
+        <div class="col-span-2">
+          <svg xmlns='http://www.w3.org/2000/svg' width="140" height="30" fill='none' viewBox='0 0 204 30' class="mb-4">
+              <g clip-path='url(#footer-a)'>
+                <path fill='#FBAD41' d='M52.688 13.028c-.22 0-.437.008-.654.015a.297.297 0 0 0-.102.024.365.365 0 0 0-.236.255l-.93 3.249c-.401 1.397-.252 2.687.422 3.634.618.876 1.646 1.39 2.894 1.45l5.045.306c.15.008.28.08.359.199a.492.492 0 0 1 .051.434.64.64 0 0 1-.547.426l-5.242.306c-2.848.132-5.912 2.456-6.987 5.29l-.378 1a.28.28 0 0 0 .248.382h18.054a.48.48 0 0 0 .464-.35 13.12 13.12 0 0 0 .48-3.54c0-7.22-5.789-13.072-12.933-13.072'></path>
+                <path fill='#FFF' d='M85.519 18.886h2.99v8.249h5.218v2.647h-8.208V18.886ZM96.819 24.365v-.032c0-3.13 2.493-5.665 5.821-5.665 3.327 0 5.789 2.508 5.789 5.633v.032c0 3.129-2.493 5.665-5.821 5.665s-5.79-2.505-5.79-5.633Zm8.562 0v-.032c0-1.573-1.123-2.942-2.773-2.942-1.65 0-2.725 1.337-2.725 2.91v.032c0 1.572 1.122 2.942 2.757 2.942 1.634 0 2.741-1.338 2.741-2.91ZM112.086 25.003V18.89h3.033v6.055c0 1.572.783 2.317 1.985 2.317 1.201 0 1.985-.717 1.985-2.242v-6.134h3.032v6.039c0 3.519-1.985 5.056-5.049 5.056s-4.99-1.573-4.99-4.98M126.694 18.889h4.159c3.848 0 6.081 2.241 6.081 5.382v.032c0 3.14-2.265 5.477-6.144 5.477h-4.096V18.886v.004Zm4.202 8.216c1.788 0 2.97-.995 2.97-2.754v-.032c0-1.744-1.185-2.755-2.97-2.755h-1.217v5.541h1.217ZM141.277 18.886h8.621v2.648h-5.636v1.85h5.096v2.505h-5.096v3.893h-2.985V18.886ZM154.054 18.886h2.989v8.249h5.219v2.647h-8.208V18.886ZM170.067 18.809h2.878l4.589 10.971h-3.202l-.788-1.946h-4.159l-.768 1.946h-3.143l4.589-10.971h.004Zm2.619 6.676-1.202-3.097-1.217 3.097h2.419ZM181.383 18.889h5.096c1.647 0 2.789.438 3.509 1.182.635.621.954 1.465.954 2.536v.032c0 1.664-.879 2.77-2.218 3.344l2.572 3.797h-3.45l-2.17-3.3h-1.308v3.3h-2.989V18.886l.004.004Zm4.959 5.23c1.016 0 1.602-.497 1.602-1.29v-.031c0-.856-.614-1.29-1.618-1.29h-1.954v2.616h1.973l-.003-.004ZM195.253 18.886h8.669v2.568h-5.711v1.648h5.175v2.384h-5.175v1.728h5.79v2.568h-8.748V18.886ZM78.976 25.642c-.418.956-1.3 1.633-2.47 1.633-1.63 0-2.756-1.37-2.756-2.942V24.3c0-1.573 1.094-2.91 2.725-2.91 1.229 0 2.166.764 2.564 1.807h3.147c-.505-2.591-2.757-4.53-5.683-4.53-3.324 0-5.821 2.536-5.821 5.665v.032c0 3.129 2.461 5.633 5.79 5.633 2.843 0 5.068-1.864 5.655-4.36h-3.155l.004.004Z'></path>
+                <path fill='#F6821F' d='m44.808 29.578.334-1.175c.402-1.397.253-2.687-.42-3.634-.62-.876-1.647-1.39-2.896-1.45l-23.665-.306a.467.467 0 0 1-.374-.199.492.492 0 0 1-.052-.434.64.64 0 0 1 .552-.426l23.886-.306c2.836-.131 5.9-2.456 6.975-5.29l1.362-3.6a.914.914 0 0 0 .04-.477C48.998 5.259 42.79 0 35.368 0c-6.842 0-12.647 4.462-14.73 10.665a6.92 6.92 0 0 0-4.911-1.374c-3.28.33-5.92 3.002-6.246 6.318a7.148 7.148 0 0 0 .18 2.472c-5.36.16-9.66 4.598-9.66 10.052 0 .493.035.979.106 1.453a.46.46 0 0 0 .457.402h43.704a.57.57 0 0 0 .54-.418'></path>
+              </g>
+              <defs>
+                <clipPath id='footer-a'>
+                  <path fill='#FFF' d='M0 0h204v30H0z'></path>
+                </clipPath>
+              </defs>
+            </svg>
+          <p class="text-gray-300 mb-4">Cloudflare provides security, performance, and reliability for any company and developer in the world.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-white hover:text-gray-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg>
+            </a>
+            <a href="#" class="text-white hover:text-gray-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+            </a>
+            <a href="#" class="text-white hover:text-gray-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+            </a>
+            <a href="#" class="text-white hover:text-gray-300">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z" clip-rule="evenodd"></path></svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-white font-medium mb-4">Products</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="text-gray-300 hover:text-white">Zero Trust</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Application Services</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Network Services</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Edge Services</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-white font-medium mb-4">Resources</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="text-gray-300 hover:text-white">Documentation</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Learning Center</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Blog</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Support</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-white font-medium mb-4">About Cloudflare</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="text-gray-300 hover:text-white">About Us</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Careers</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Press</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-300 text-sm">© 2025 Cloudflare, Inc. All rights reserved.</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="text-gray-300 hover:text-white text-sm">Privacy Policy</a>
+          <a href="#" class="text-gray-300 hover:text-white text-sm">Terms of Service</a>
+          <a href="#" class="text-gray-300 hover:text-white text-sm">Cookie Settings</a>
+        </div>
+      </div>
     </div>
   </footer>
 </body>
