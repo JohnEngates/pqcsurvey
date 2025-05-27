@@ -129,14 +129,14 @@ const factors = [
       'General security staff with basic crypto knowledge.',
       'At least one crypto‑savvy engineer.',
       'Dedicated crypto/security team; continuous training.',
-      'Recognised experts contributing to standards / OSS.'
+      'Recognized experts contributing to standards / OSS.'
     ],
     actionableGuidance: {
       what: 'Build internal cryptographic expertise',
       why: 'Successfully implementing and maintaining PQC requires specialized knowledge and skills',
       how: [
         'Invest in cryptography training for security team members',
-        'Hire or develop dedicated cryptography specialists',
+        'Hire or develop dedicated cryptography specialists and/or engage consultants',
         'Create partnerships with academic institutions or research organizations',
         'Establish continuous learning programs for crypto-engineering',
         'Participate in PQC standardization efforts and open-source projects'
@@ -195,13 +195,13 @@ const factors = [
     id: 6, 
     w: 8,
     label: 'Environment complexity',
-    desc: 'Sites & bespoke systems (lower is better).',
+    desc: 'Number of sites & bespoke systems (1 = very complex, 5 = very simple).',
     guide: [
       'Highly distributed, multi‑cloud, many legacy apps.',
       'Global footprint; numerous sites & some legacy.',
       'Multiple regional sites; mixed legacy & modern.',
       'Few sites with standardised stack.',
-      'Single site / fully standardised environment.'
+      'Single site / fully standardized environment.'
     ],
     actionableGuidance: {
       what: 'Reduce environment complexity',
@@ -475,7 +475,7 @@ const generalRecommendations = [
   {
     category: 'Technical Implementation',
     items: [
-      'Implement hybrid cryptographic solutions for compatibility',
+      'Implement hybrid cryptography to maximize compatibility',
       'Deploy automated crypto-asset discovery and management',
       'Create crypto-agile architecture patterns',
       'Establish PQC testing frameworks',
@@ -503,12 +503,12 @@ const cloudflareRecommendations = {
     benefits: [
       'Automatic PQC algorithm updates as standards evolve',
       'Global edge network optimized for PQC performance',
-      'Hybrid cryptography support maintaining compatibility',
-      'Built-in protection against quantum threats'
+      'Hybrid cryptography now support maintaining compatibility',
+      'Built-in end-to-end protection against future quantum threats'
     ],
     features: [
       'TLS 1.3 with PQC support',
-      'Zero Trust security with quantum-safe algorithms',
+      'Zero Trust security using quantum-safe algorithms',
       'Real-time crypto analytics and visibility',
       'Automated certificate management'
     ]
