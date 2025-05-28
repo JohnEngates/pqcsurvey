@@ -17,8 +17,8 @@ This interactive survey helps organizations benchmark their preparedness for the
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/JohnEngates/pqcsurvey.git
-cd pqcsurvey
+git clone https://github.com/JohnEngates/pqcsurvey-claude.git
+cd pqcsurvey-claude
 ```
 
 2. Start a local web server:
@@ -28,7 +28,7 @@ python3 -m http.server 8000
 
 3. Open in your browser:
 ```
-http://localhost:8000/survey.html
+http://localhost:8000
 ```
 
 ## Usage
@@ -51,18 +51,19 @@ MIT License - feel free to use and modify as needed.
 
 ## Project Structure
 
-- `survey-config.js` - Configuration file containing all survey data:
+- `index.html` - Main application entry point
+- `src/config/survey-config.js` - Configuration file containing:
   - Industry-specific weight profiles
   - 14 assessment factors with detailed guidance
   - Score thresholds and recommendations
   - General and vendor-specific guidance
-
-- `survey.html` - Main application file with all UI and logic:
-  - Survey form with factor rating inputs
-  - Industry profile selector
-  - Scoring algorithm
-  - Results visualization
-  - Recommendation engine
+- `src/js/` - JavaScript modules:
+  - `main.js` - Application initialization and coordination
+  - `survey.js` - Survey form handling and user interactions
+  - `scoring.js` - QRI calculation and scoring algorithms
+  - `visualization.js` - Chart rendering and visual components
+  - `recommendations.js` - Recommendation engine and guidance generation
+- `src/css/styles.css` - Application styling and layout
 
 ## Contributing
 

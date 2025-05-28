@@ -1,0 +1,185 @@
+/* Updated Cloudflare theme based on cloudflare.com/pqc/ */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: #222;
+  background-color: #f7f7f8;
+}
+
+.cloudflare-gradient {
+  background-color: #f6821f; /* Cloudflare orange */
+  background: linear-gradient(90deg, #f6821f 0%, #fbad41 100%);
+}
+
+.cloudflare-orange {
+  background-color: #f6821f; /* Cloudflare orange */
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.cloudflare-orange:hover {
+  opacity: 0.9;
+  background-color: #fbad41;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(246, 130, 31, 0.2);
+}
+
+.cloudflare-dark {
+  background-color: #f6821f; /* Cloudflare orange */
+}
+
+.cloudflare-text {
+  color: #222;
+}
+
+.cloudflare-blue {
+  color: #f6821f; /* Changed to Cloudflare orange */
+}
+
+.cloudflare-border {
+  border-color: #eaeaea;
+}
+
+/* Enhanced chart container styling */
+.chart-container {
+  position: relative;
+  height: 600px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background-color: white;
+  border: 1px solid rgba(246, 130, 31, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #f6821f;
+  transform: translateY(-2px);
+}
+
+/* Button styling */
+.btn-cloudflare {
+  background-color: #f6821f;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-cloudflare:hover {
+  opacity: 0.9;
+  background-color: #fbad41;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 130, 31, 0.2);
+}
+
+.btn-cloudflare-orange {
+  background-color: #f6821f;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-cloudflare-orange:hover {
+  opacity: 0.9;
+  background-color: #fbad41;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 130, 31, 0.2);
+}
+
+/* Enhanced card styling */
+.cf-card {
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  transition: all 0.3s ease;
+}
+
+.cf-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-color: rgba(246, 130, 31, 0.2);
+}
+
+/* Results section styling */
+#results {
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Section transitions */
+.results-section {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+}
+
+.results-section:last-child {
+  border-bottom: none;
+}
+
+/* Score display enhancement */
+#scoreDisplay {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #f6821f 0%, #fbad41 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Category cards */
+.category-card {
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+/* Progress bars */
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  .chart-container {
+    padding: 15px;
+  }
+  
+  /* Improve radio button spacing on mobile */
+  input[type="radio"] {
+    transform: scale(1.2);
+    margin-right: 6px;
+  }
+  
+  /* Better touch targets */
+  label {
+    padding: 8px 4px;
+    cursor: pointer;
+  }
+  
+  /* Responsive text scaling */
+  html {
+    font-size: 14px;
+  }
+}
