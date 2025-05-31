@@ -503,7 +503,7 @@ const cloudflareRecommendations = {
     benefits: [
       'Automatic PQC algorithm updates as standards evolve',
       'Global edge network optimized for PQC performance',
-      'Hybrid cryptography now support maintaining compatibility',
+      'Hybrid cryptography now supports maintaining compatibility',
       'Built-in end-to-end protection against future quantum threats'
     ],
     features: [
