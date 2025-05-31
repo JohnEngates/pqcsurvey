@@ -59,12 +59,12 @@ src/
 1. Start a local web server in the `src/` directory:
    ```bash
    cd src/
-   python3 -m http.server 8080
+   python3 -m http.server 8000
    ```
 
 2. Open your browser and navigate to:
    ```
-   http://localhost:8080
+   http://localhost:8000
    ```
 
 ## Benefits of Refactoring
