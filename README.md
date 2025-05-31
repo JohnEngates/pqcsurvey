@@ -47,7 +47,7 @@ The tool automatically generates personalized guidance based on your lowest-scor
 
 ## License
 
-MIT License - feel free to use and modify as needed.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Project Structure
 
