@@ -131,20 +131,18 @@ function createWeightSlider(factor, container) {
   container.appendChild(weightSlider);
   
   // Add event listener for weight changes
-  setTimeout(() => {
-    const slider = document.getElementById(`weightSlider-${factor.id}`);
-    if (slider) {
-      slider.addEventListener('input', (e) => {
-        const newWeight = parseInt(e.target.value);
-        currentWeights[factor.id] = newWeight;
-        
-        // Update all instances of this weight label
-        document.querySelectorAll(`.weight-label-${factor.id}`).forEach(el => {
-          el.textContent = newWeight;
-        });
+  const slider = weightSlider.querySelector(`#weightSlider-${factor.id}`);
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      const newWeight = parseInt(e.target.value);
+      currentWeights[factor.id] = newWeight;
+
+      // Update all instances of this weight label
+      document.querySelectorAll(`.weight-label-${factor.id}`).forEach(el => {
+        el.textContent = newWeight;
       });
-    }
-  }, 100);
+    });
+  }
 }
 
 export function handleFormSubmission() {
