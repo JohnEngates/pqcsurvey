@@ -17,8 +17,8 @@ This interactive survey helps organizations benchmark their preparedness for the
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/JohnEngates/pqcsurvey-claude.git
-cd pqcsurvey-claude
+git clone https://github.com/JohnEngates/pqcsurvey.git
+cd pqcsurvey
 ```
 
 2. Start a local web server:
